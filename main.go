@@ -1,17 +1,36 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
-func main() {
-	fmt.Println("Main: started application on port 9002!")
-	http.HandleFunc("/", helloworld)
-	log.Fatal(http.ListenAndServe(":9002", nil))
+type Product struct {
+	id        int
+	name      string
+	inventory int
+	price     int
 }
 
-func helloworld(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello world \n How are you doing today ?")
+func main() {
+	fmt.Println("Start database application...")
+	db, err := sql.Open("sqlite3", "./practiceit.db")
+	if err != nil {
+		log.Fatal("Occured fatal error: ", err.Error())
+	}
+
+	rows, err := db.Query("SELECT id, name, inventory, price FROM products")
+	if err != nil {
+		log.Fatal("Occured fatal error while querying: ", err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p Product
+		rows.Scan(&p.id, &p.name, &p.inventory, &p.price)
+		fmt.Printf("Row - %v \n", p)
+	}
 }
