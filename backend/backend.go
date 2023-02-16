@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -36,6 +37,7 @@ func (a *App) Initialize() {
 func (a *App) InitializeRouter() {
 	a.Router.HandleFunc("/products", a.allProducts).Methods("GET")
 	a.Router.HandleFunc("/product/{id}", a.fetchProduct).Methods("GET")
+	a.Router.HandleFunc("/products", a.newProduct).Methods("POST")
 }
 
 func (a *App) Run() {
@@ -67,6 +69,19 @@ func (a *App) fetchProduct(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Printf("getProduct - error %s \n", err.Error())
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+	respondWithJSON(w, http.StatusOK, p)
+}
+
+func (a *App) newProduct(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var p *product
+	json.Unmarshal(reqBody, &p)
+
+	err := p.createProduct(a.DB)
+	if err != nil {
+		fmt.Printf("createProduct - error %s \n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 	respondWithJSON(w, http.StatusOK, p)

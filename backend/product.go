@@ -37,3 +37,16 @@ func getProducts(db *sql.DB) ([]product, error) {
 func (p *product) getProduct(db *sql.DB) error {
 	return db.QueryRow("SELECT id, productCode, status, name, inventory, price FROM products WHERE id = ?", p.ID).Scan(&p.ID, &p.ProductCode, &p.Status, &p.Name, &p.Inventory, &p.Price)
 }
+
+func (p *product) createProduct(db *sql.DB) error {
+	res, err := db.Exec("INSERT INTO products (name, productCode, inventory, price, status) VALUES (?, ?, ?, ?, ?)", p.Name, p.ProductCode, p.Inventory, p.Price, p.Status)
+	if err != nil {
+		return err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+	p.ID = int(id)
+	return nil
+}
