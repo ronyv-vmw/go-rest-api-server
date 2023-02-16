@@ -53,6 +53,7 @@ func (a *App) allProducts(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("getProducts - error %s \n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	respondWithJSON(w, http.StatusOK, products)
@@ -70,6 +71,7 @@ func (a *App) fetchProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("getProduct - error %s \n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 	respondWithJSON(w, http.StatusOK, p)
 }
@@ -83,6 +85,7 @@ func (a *App) newProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("createProduct - error %s \n", err.Error())
 		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 	respondWithJSON(w, http.StatusOK, p)
 }
